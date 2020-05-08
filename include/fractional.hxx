@@ -11,33 +11,17 @@
 using std::declval;
 using namespace fractional;
 
-template<class Fractional>
-constexpr bool is_noexcept() {
-    using _NType = typename Fractional::NaturalType;
-    return noexcept(typename Fractional::PlusOperator{}(declval<_NType>(),
-                                                        declval<_NType>())) &&
-           noexcept(typename Fractional::DivideOperator{}(declval<_NType>(),
-                                                          declval<_NType>())) &&
-           noexcept(typename Fractional::MultiplyOperator{}(declval<_NType>(),
-                                                            declval<_NType>())) &&
-           noexcept(typename Fractional::NegateOperator{}(declval<_NType>())) &&
-           noexcept(typename Fractional::MinusOperator{}(declval<_NType>(),
-                                                         declval<_NType>())) &&
-           noexcept(typename Fractional::ModulusOperator{}(declval<_NType>(),
-                                                           declval<_NType>()));
-}
-
 /**
  * @param lhs = a/b
  * @param rhs = c/d
  * @return Simplified a/b + c/d -> (a * b/lcm + c * d/lcm)/lcm
  */
-template<class _NType, template<class...> class _Checker, DECLARATION_TEMPLATE_PARAMS>
-constexpr Fractional<_NType, _Checker, TEMPLATE_PARAMS>
-operator+(const Fractional<_NType, _Checker, TEMPLATE_PARAMS> &lhs,
-          const Fractional<_NType, _Checker, TEMPLATE_PARAMS> &rhs) noexcept(
-is_noexcept<Fractional<_NType, _Checker, TEMPLATE_PARAMS>>()) {
-    using Fract = Fractional<_NType, _Checker, TEMPLATE_PARAMS>;
+template<class _NType, template<class, template<class...> class, class...> class _Checker,
+        template<class...> class _Checker_, DECLARATION_TEMPLATE_PARAMS>
+constexpr Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS>
+Plus(const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &lhs,
+     const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &rhs) {
+    using Fract = Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS>;
     using NaturalType = _NType;
     using Divide = typename Fract::DivideOperator;
     using Multiply = typename Fract::MultiplyOperator;
@@ -91,12 +75,12 @@ is_noexcept<Fractional<_NType, _Checker, TEMPLATE_PARAMS>>()) {
  * @param rhs = c/d
  * @return Simplified a/b + c/d -> (a * b/lcm - c * d/lcm)/lcm
  */
-template<class _NType, template<class...> class _Checker, DECLARATION_TEMPLATE_PARAMS>
-constexpr Fractional<_NType, _Checker, TEMPLATE_PARAMS>
-operator-(const Fractional<_NType, _Checker, TEMPLATE_PARAMS> &lhs,
-          const Fractional<_NType, _Checker, TEMPLATE_PARAMS> &rhs) noexcept(
-is_noexcept<Fractional<_NType, _Checker, TEMPLATE_PARAMS>>()) {
-    using Fract = Fractional<_NType, _Checker, TEMPLATE_PARAMS>;
+template<class _NType, template<class, template<class...> class, class...> class _Checker,
+        template<class...> class _Checker_, DECLARATION_TEMPLATE_PARAMS>
+constexpr Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS>
+Minus(const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &lhs,
+      const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &rhs) {
+    using Fract = Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS>;
     using NaturalType = _NType;
     using Divide = typename Fract::DivideOperator;
     using Multiply = typename Fract::MultiplyOperator;
@@ -145,14 +129,33 @@ is_noexcept<Fractional<_NType, _Checker, TEMPLATE_PARAMS>>()) {
     return Fract{lhs_ad_lcm0rhs_cd_lcm, lcm};
 }
 
-template<class _NType, template<class...> class _Checker, DECLARATION_TEMPLATE_PARAMS>
-std::ostream &operator<<(std::ostream &os, const Fractional<_NType, _Checker, TEMPLATE_PARAMS> &rhs) {
+template<class _NType, template<class, template<class...> class, class...> class _Checker,
+        template<class...> class _Checker_, DECLARATION_TEMPLATE_PARAMS>
+constexpr decltype(auto)
+operator-(const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &lhs,
+      const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &rhs) {
+    return Minus(lhs, rhs);
+}
+
+template<class _NType, template<class, template<class...> class, class...> class _Checker,
+        template<class...> class _Checker_, DECLARATION_TEMPLATE_PARAMS>
+constexpr decltype(auto)
+operator+(const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &lhs,
+          const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &rhs) {
+    return Plus(lhs, rhs);
+}
+
+
+template<class _NType, template<class, template<class...> class, class...> class _Checker,
+        template<class...> class _Checker_, DECLARATION_TEMPLATE_PARAMS>
+std::ostream &operator<<(std::ostream &os, const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &rhs) {
     os << rhs.nominator() << '/' << rhs.denominator();
     return os;
 }
 
-template<class _NType, template<class...> class _Checker, DECLARATION_TEMPLATE_PARAMS>
-std::wostream &operator<<(std::wostream &os, const Fractional<_NType, _Checker, TEMPLATE_PARAMS> &rhs) {
+template<class _NType, template<class, template<class...> class, class...> class _Checker,
+        template<class...> class _Checker_, DECLARATION_TEMPLATE_PARAMS>
+std::wostream &operator<<(std::wostream &os, const Fractional<_NType, _Checker, _Checker_, TEMPLATE_PARAMS> &rhs) {
     os << rhs.nominator() << '/' << rhs.denominator();
     return os;
 }

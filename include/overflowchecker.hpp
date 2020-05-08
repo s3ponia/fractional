@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <exception>
+#include <string>
 
 #define DECLARATION_TEMPLATE_PARAMS \
 class _EqualOperator,\
@@ -52,12 +53,51 @@ _ModulusOperator
 
 
 namespace fractional::overflow {
+    using namespace std::string_literals;
 
-    struct OverflowError : std::runtime_error {
-        using std::runtime_error::runtime_error;
+    template<class _LhsType, class _RhsType>
+    struct OverflowBinaryError final : std::exception {
+        using LhsType = _LhsType;
+        using RhsType = _RhsType;
+
+        OverflowBinaryError(const LhsType &lhs, const RhsType &rhs) : lhs_(lhs), rhs_(rhs) {}
+
+        const LhsType &lhs() const noexcept {
+            return lhs_;
+        }
+
+        const RhsType &rhs() const noexcept {
+            return rhs_;
+        }
+
+        [[nodiscard]] const char *what() const noexcept override {
+            return "Binary Overflow error.";
+        }
+
+    private:
+        LhsType lhs_;
+        RhsType rhs_;
     };
 
-    template<class _NaturalType, DECLARATION_DEFAULT_TEMPLATE_PARAMS>
+    template<class _NaturalType>
+    struct OverflowUnaryError final : std::exception {
+        using NaturalType = _NaturalType;
+
+        explicit OverflowUnaryError(const NaturalType &op) : operand_(op) {}
+
+        const NaturalType &operand() const noexcept {
+            return operand_;
+        }
+
+        [[nodiscard]] const char *what() const noexcept override {
+            return "Unary Overflow error.";
+        }
+
+    private:
+        NaturalType operand_;
+    };
+
+    template<class _NaturalType, DECLARATION_DEFAULT_TEMPLATE_PARAMS >
     struct CheckNoOverflow {
         using NaturalType = _NaturalType;
 
@@ -116,11 +156,14 @@ namespace fractional::overflow {
      * Class for checking overflowing
      * Contains static methods to check overflow, return true if it is not overflows, false otherwise
      */
-    template<class _NaturalType, DECLARATION_DEFAULT_TEMPLATE_PARAMS>
-    struct SignedCheckOverflow {
+    template<class _NaturalType, DECLARATION_DEFAULT_TEMPLATE_PARAMS >
+    struct IntegralCheckOverflow {
         static_assert(_EqualOperator{}(_NaturalType{}, _NegateOperator{}(_NaturalType{})),
                       "Default constructed NaturalType must be zero.");
-
+        static_assert(std::numeric_limits<_NaturalType>::is_specialized,
+                      "std::numeric_limits<_NaturalType> must be specialized");
+        static_assert(std::numeric_limits<_NaturalType>::is_integer,
+                      "_NaturalType must be integer");
         using NaturalType = _NaturalType;
 
         using PlusOperator = _PlusOperator;
@@ -160,9 +203,14 @@ namespace fractional::overflow {
         static constexpr bool CheckBitwiseLeftShift(const NaturalType &lhs, std::size_t rhs);
     };
 
-    template<class _NaturalType, DECLARATION_DEFAULT_TEMPLATE_PARAMS>
+    template<class _NaturalType, template<class...> class _Checker = IntegralCheckOverflow, DECLARATION_DEFAULT_TEMPLATE_PARAMS >
     struct ThrowOnCheck {
         using NaturalType = _NaturalType;
+
+        using Checker = _Checker<NaturalType, TEMPLATE_PARAMS>;
+        using BinaryError = OverflowBinaryError<NaturalType, NaturalType>;
+        using BitwiseError = OverflowBinaryError<NaturalType, std::size_t>;
+        using UnaryError = OverflowUnaryError<NaturalType>;
 
         using PlusOperator = _PlusOperator;
         using MinusOperator = _MinusOperator;
@@ -197,9 +245,14 @@ namespace fractional::overflow {
         static void CheckBitwiseLeftShift(const NaturalType &lhs, std::size_t rhs);
     };
 
-    template<class _NaturalType, DECLARATION_DEFAULT_TEMPLATE_PARAMS>
+    template<class _NaturalType, template<class...> class _Checker = CheckNoOverflow, DECLARATION_DEFAULT_TEMPLATE_PARAMS >
     struct NoCheck {
         using NaturalType = _NaturalType;
+
+        using Checker = _Checker<NaturalType, TEMPLATE_PARAMS>;
+        using BinaryError = OverflowBinaryError<NaturalType, NaturalType>;
+        using BitwiseError = OverflowBinaryError<NaturalType, std::size_t>;
+        using UnaryError = OverflowUnaryError<NaturalType>;
 
         using PlusOperator = _PlusOperator;
         using MinusOperator = _MinusOperator;
@@ -232,6 +285,10 @@ namespace fractional::overflow {
         static void CheckDecrement(const NaturalType &lhs) noexcept {};
 
         static void CheckBitwiseLeftShift(const NaturalType &lhs, std::size_t rhs) noexcept {};
+    };
+
+    template<class _NaturalType>
+    struct OverflowChecker : ThrowOnCheck<_NaturalType> {
     };
 }
 

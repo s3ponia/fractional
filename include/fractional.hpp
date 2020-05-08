@@ -14,8 +14,11 @@
 #include "utility.hpp"
 
 NAMESPACE_FRACTIONAL_BEGIN
+    using std::declval;
+
     template<class _NaturalType,
-            template<class...> class _OverflowChecker = overflow::NoCheck,
+            template<class, template<class...> class, class...> class _OverflowChecker = overflow::ThrowOnCheck,
+            template<class...> class _Checker = overflow::IntegralCheckOverflow,
             class _EqualOperator = std::equal_to<_NaturalType>,
             class _NoEqualOperator = std::not_equal_to<_NaturalType>,
             class _GreaterOperator = std::greater<_NaturalType>,
@@ -32,7 +35,7 @@ NAMESPACE_FRACTIONAL_BEGIN
     public:
         using NaturalType = _NaturalType;
 
-        using Checker = _OverflowChecker<_NaturalType, TEMPLATE_PARAMS>;
+        using Checker = _OverflowChecker<_NaturalType, _Checker, TEMPLATE_PARAMS>;
 
         using PlusOperator = utility::OperatorWrapper<_PlusOperator, Checker::CheckPlus>;
         using MinusOperator = utility::OperatorWrapper<_MinusOperator, Checker::CheckMinus>;
@@ -62,18 +65,23 @@ NAMESPACE_FRACTIONAL_BEGIN
         operator=(Fractional &&) noexcept(std::is_nothrow_move_assignable<NaturalType>::value) = default;
 
         constexpr Fractional(const NaturalType &nominator,
-                             const NaturalType &denominator) noexcept(std::is_nothrow_copy_constructible<NaturalType>::value)
-                : nominator_(nominator), denominator_(denominator) {}
+                             const NaturalType &denominator)
+                : nominator_(nominator), denominator_(denominator) {
+            Checker::CheckDivide(nominator_, denominator_);
+        }
 
         constexpr Fractional(NaturalType &&nominator,
-                             NaturalType &&denominator) noexcept(std::is_nothrow_move_constructible<NaturalType>::value)
-                : nominator_(nominator), denominator_(denominator) {}
+                             NaturalType &&denominator)
+                : nominator_(nominator), denominator_(denominator) {
+            Checker::CheckDivide(nominator_, denominator_);
+        }
 
         template<class T, typename = typename std::enable_if<
                 std::is_floating_point<T>::value &&
                 std::is_convertible<NaturalType, T>::value
         >::type>
         operator T() {
+            Checker::CheckDivide(nominator_, denominator_);
             return std::divides<T>{}(nominator_, denominator_);
         }
 
