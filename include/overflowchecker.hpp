@@ -115,39 +115,39 @@ namespace fractional::overflow {
         using LessOperator = _LessOperator;
         using LessEqualOperator = _LessEqualOperator;
 
-        static bool CheckMultiply(const NaturalType &lhs, const NaturalType &rhs) noexcept {
+        static constexpr bool CheckMultiply(const NaturalType &lhs, const NaturalType &rhs) noexcept {
             return true;
         }
 
-        static bool CheckPlus(const NaturalType &lhs, const NaturalType &rhs) noexcept {
+        static constexpr bool CheckPlus(const NaturalType &lhs, const NaturalType &rhs) noexcept {
             return true;
         }
 
-        static bool CheckDivide(const NaturalType &lhs, const NaturalType &rhs) noexcept {
+        static constexpr bool CheckDivide(const NaturalType &lhs, const NaturalType &rhs) noexcept {
             return true;
         }
 
-        static bool CheckMinus(const NaturalType &lhs, const NaturalType &rhs) noexcept {
+        static constexpr bool CheckMinus(const NaturalType &lhs, const NaturalType &rhs) noexcept {
             return true;
         }
 
-        static bool CheckNegate(const NaturalType &lhs) noexcept {
+        static constexpr bool CheckNegate(const NaturalType &lhs) noexcept {
             return true;
         }
 
-        static bool CheckModulus(const NaturalType &lhs, const NaturalType &rhs) noexcept {
+        static constexpr bool CheckModulus(const NaturalType &lhs, const NaturalType &rhs) noexcept {
             return true;
         }
 
-        static bool CheckIncrement(const NaturalType &lhs) noexcept {
+        static constexpr bool CheckIncrement(const NaturalType &lhs) noexcept {
             return true;
         }
 
-        static bool CheckDecrement(const NaturalType &lhs) noexcept {
+        static constexpr bool CheckDecrement(const NaturalType &lhs) noexcept {
             return true;
         }
 
-        static bool CheckBitwiseLeftShift(const NaturalType &lhs, std::size_t rhs) noexcept {
+        static constexpr bool CheckBitwiseLeftShift(const NaturalType &lhs, std::size_t rhs) noexcept {
             return true;
         }
     };
@@ -268,23 +268,23 @@ namespace fractional::overflow {
         using LessOperator = _LessOperator;
         using LessEqualOperator = _LessEqualOperator;
 
-        static void CheckMultiply(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
+        static constexpr void CheckMultiply(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
 
-        static void CheckPlus(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
+        static constexpr void CheckPlus(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
 
-        static void CheckDivide(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
+        static constexpr void CheckDivide(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
 
-        static void CheckMinus(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
+        static constexpr void CheckMinus(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
 
-        static void CheckNegate(const NaturalType &lhs) noexcept {};
+        static constexpr void CheckNegate(const NaturalType &lhs) noexcept {};
 
-        static void CheckModulus(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
+        static constexpr void CheckModulus(const NaturalType &lhs, const NaturalType &rhs) noexcept {};
 
-        static void CheckIncrement(const NaturalType &lhs) noexcept {};
+        static constexpr void CheckIncrement(const NaturalType &lhs) noexcept {};
 
-        static void CheckDecrement(const NaturalType &lhs) noexcept {};
+        static constexpr void CheckDecrement(const NaturalType &lhs) noexcept {};
 
-        static void CheckBitwiseLeftShift(const NaturalType &lhs, std::size_t rhs) noexcept {};
+        static constexpr void CheckBitwiseLeftShift(const NaturalType &lhs, std::size_t rhs) noexcept {};
     };
 
     template<class _NaturalType>
