@@ -45,8 +45,11 @@ namespace fractional::overflow {
                 GreaterOperator, EqualOperator, NoEqualOperator>(rhs) && EqualOperator{}(lhs, min_value))
             return CheckMinNegate();
 
-        return LessEqualOperator{}(lhs, DivideOperator{}(max_value, rhs)) &&
-               GreaterEqualOperator{}(lhs, DivideOperator{}(min_value, rhs));
+        return IsPositiveOne<NaturalType, MultiplyOperator,
+                DivideOperator, LessOperator,
+                GreaterOperator, EqualOperator>(lhs) || ((EqualOperator{}(rhs, NaturalType{}) ||
+                LessEqualOperator{}(lhs, DivideOperator{}(max_value, rhs))) &&
+               (EqualOperator{}(rhs, NaturalType{}) || GreaterEqualOperator{}(lhs, DivideOperator{}(min_value, rhs))));
     }
 
     template<class _NaturalType, DECLARATION_TEMPLATE_PARAMS>

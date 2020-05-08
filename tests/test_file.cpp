@@ -9,20 +9,60 @@
 #define EPS 1e-10L
 
 using floating_type = long double;
+using is_signed = std::true_type;
+using is_unsigned = std::false_type;
 
 template<class T>
-void test_overflow_multiply_max() {
+void test_overflow_multiply_max(is_signed) {
     using OverflowChecker = fractional::overflow::SignedCheckOverflow<T>;
     auto max = std::numeric_limits<T>::max();
     auto min = std::numeric_limits<T>::min();
-    BOOST_CHECK(!OverflowChecker::CheckNegate(min));
-    BOOST_CHECK(OverflowChecker::CheckNegate(max));
-    BOOST_CHECK(!OverflowChecker::CheckMultiply(-1, min));
-    BOOST_CHECK(OverflowChecker::CheckMultiply(-1, max));
-    BOOST_CHECK(!OverflowChecker::CheckMultiply(2, max));
-    BOOST_CHECK(!OverflowChecker::CheckMultiply(2, min));
-    BOOST_CHECK(!OverflowChecker::CheckPlus(min, min));
+    BOOST_CHECK(
+            std::is_unsigned_v<T> || (OverflowChecker::CheckNegate(min) == OverflowChecker::CheckMultiply(-1, min)));
+    BOOST_CHECK(OverflowChecker::CheckNegate(max) == OverflowChecker::CheckMultiply(-1, max));
+    BOOST_CHECK(OverflowChecker::CheckNegate(0));
+
+    BOOST_CHECK(OverflowChecker::CheckPlus(0, 0));
+    BOOST_CHECK(OverflowChecker::CheckPlus(0, 1));
+    BOOST_CHECK(OverflowChecker::CheckPlus(1, 0));
+    BOOST_CHECK(OverflowChecker::CheckPlus(1, 1));
+    BOOST_CHECK(OverflowChecker::CheckPlus(min, max));
+    BOOST_CHECK(std::is_signed_v<T> || (std::is_unsigned_v<T> && !OverflowChecker::CheckPlus(-1, 1)));
     BOOST_CHECK(!OverflowChecker::CheckPlus(max, max));
+
+    BOOST_CHECK(OverflowChecker::CheckMultiply(0, 0));
+    BOOST_CHECK(OverflowChecker::CheckMultiply(1, max));
+    BOOST_CHECK(OverflowChecker::CheckMultiply(1, min));
+    BOOST_CHECK(!OverflowChecker::CheckMultiply(max, max));
+    BOOST_CHECK(!OverflowChecker::CheckMultiply(2, max));
+}
+
+template<class T>
+void test_overflow_multiply_max(is_unsigned) {
+    using OverflowChecker = fractional::overflow::SignedCheckOverflow<T>;
+    auto max = std::numeric_limits<T>::max();
+    auto min = std::numeric_limits<T>::min();
+    BOOST_CHECK(OverflowChecker::CheckNegate(max) == OverflowChecker::CheckMultiply(-1, max));
+    BOOST_CHECK(OverflowChecker::CheckNegate(0));
+
+    BOOST_CHECK(OverflowChecker::CheckPlus(0, 0));
+    BOOST_CHECK(OverflowChecker::CheckPlus(0, 1));
+    BOOST_CHECK(OverflowChecker::CheckPlus(1, 0));
+    BOOST_CHECK(OverflowChecker::CheckPlus(1, 1));
+    BOOST_CHECK(OverflowChecker::CheckPlus(min, max));
+    BOOST_CHECK(!OverflowChecker::CheckPlus(-1, 1));
+    BOOST_CHECK(!OverflowChecker::CheckPlus(max, max));
+
+    BOOST_CHECK(OverflowChecker::CheckMultiply(0, 0));
+    BOOST_CHECK(OverflowChecker::CheckMultiply(1, max));
+    BOOST_CHECK(OverflowChecker::CheckMultiply(1, min));
+    BOOST_CHECK(!OverflowChecker::CheckMultiply(max, max));
+    BOOST_CHECK(!OverflowChecker::CheckMultiply(2, max));
+}
+
+template<class T>
+void test_overflow_multiply_max() {
+    test_overflow_multiply_max<T>(typename std::conditional<std::is_unsigned_v<T>, is_unsigned, is_signed>::type{});
 }
 
 bool is_equal(long double a, long double b) {
@@ -33,12 +73,19 @@ int test_main(int, char *[])             // note the name!
 {
     using namespace fractional;
     using namespace fractional::overflow;
-    std::cout << -std::numeric_limits<int>::max() << ' ' << -std::numeric_limits<int>::min() << ' '
-              << std::numeric_limits<int>::min() << '\n';
     BOOST_CHECK(std::is_trivial<fraction>::value);
-//    test_overflow_multiply_max<int>();
-//    test_overflow_multiply_max<long>();
+    test_overflow_multiply_max<int>();
+    test_overflow_multiply_max<long>();
+    test_overflow_multiply_max<int8_t>();
+    test_overflow_multiply_max<int16_t>();
+    test_overflow_multiply_max<int32_t>();
+    test_overflow_multiply_max<int64_t>();
+    test_overflow_multiply_max<ptrdiff_t>();
     test_overflow_multiply_max<unsigned>();
+    test_overflow_multiply_max<uint8_t>();
+    test_overflow_multiply_max<uint16_t>();
+    test_overflow_multiply_max<uint32_t>();
+    test_overflow_multiply_max<uint64_t>();
 
     return boost::exit_success;
 }
