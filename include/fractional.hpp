@@ -5,14 +5,17 @@
 #ifndef FRACTIONNUMBER_FRACTIONAL_HPP
 #define FRACTIONNUMBER_FRACTIONAL_HPP
 
+#define NAMESPACE_FRACTIONAL_BEGIN namespace fractional {
+#define NAMESPACE_FRACTIONAL_END }
+
 #include <type_traits>
 #include <functional>
 #include "overflowchecker.hpp"
 #include "utility.hpp"
 
-namespace fractional {
+NAMESPACE_FRACTIONAL_BEGIN
     template<class _NaturalType,
-            template<class...> class _OverflowChecker = overflow::ThrowOnCheck,
+            template<class...> class _OverflowChecker = overflow::NoCheck,
             class _EqualOperator = std::equal_to<_NaturalType>,
             class _NoEqualOperator = std::not_equal_to<_NaturalType>,
             class _GreaterOperator = std::greater<_NaturalType>,
@@ -31,12 +34,12 @@ namespace fractional {
 
         using Checker = _OverflowChecker<_NaturalType, TEMPLATE_PARAMS>;
 
-        using PlusOperator = utility::OperatorWraper<_PlusOperator, Checker::CheckPlus>;
-        using MinusOperator = utility::OperatorWraper<_MinusOperator, Checker::CheckMinus>;
-        using MultiplyOperator = utility::OperatorWraper<_MultiplyOperator, Checker::CheckMultiply>;
-        using DivideOperator = utility::OperatorWraper<_DivideOperator, Checker::CheckDivide>;
-        using NegateOperator = utility::OperatorWraper<_NegateOperator, Checker::CheckNegate>;
-        using ModulusOperator = utility::OperatorWraper<_ModulusOperator, Checker::CheckModulus>;
+        using PlusOperator = utility::OperatorWrapper<_PlusOperator, Checker::CheckPlus>;
+        using MinusOperator = utility::OperatorWrapper<_MinusOperator, Checker::CheckMinus>;
+        using MultiplyOperator = utility::OperatorWrapper<_MultiplyOperator, Checker::CheckMultiply>;
+        using DivideOperator = utility::OperatorWrapper<_DivideOperator, Checker::CheckDivide>;
+        using NegateOperator = utility::OperatorWrapper<_NegateOperator, Checker::CheckNegate>;
+        using ModulusOperator = utility::OperatorWrapper<_ModulusOperator, Checker::CheckModulus>;
 
         using EqualOperator = _EqualOperator;
         using NoEqualOperator = _NoEqualOperator;
@@ -74,11 +77,11 @@ namespace fractional {
             return std::divides<T>{}(nominator_, denominator_);
         }
 
-        const NaturalType &nominator() const {
+        const NaturalType &nominator() const noexcept {
             return nominator_;
         }
 
-        const NaturalType &denominator() const {
+        const NaturalType &denominator() const noexcept {
             return denominator_;
         }
 
@@ -88,7 +91,7 @@ namespace fractional {
     };
 
     using fraction = Fractional<int>;
-}
+NAMESPACE_FRACTIONAL_END
 
 #include "fractional.hxx"
 
