@@ -16,9 +16,8 @@ template<class T>
 void test_overflow_multiply_max(is_signed) {
     using OverflowChecker = fractional::overflow::SignedCheckOverflow<T>;
     auto max = std::numeric_limits<T>::max();
-    auto min = std::numeric_limits<T>::min();
-    BOOST_CHECK(
-            std::is_unsigned_v<T> || (OverflowChecker::CheckNegate(min) == OverflowChecker::CheckMultiply(-1, min)));
+    auto min = std::numeric_limits<T>::lowest();
+    BOOST_CHECK(OverflowChecker::CheckNegate(min) == OverflowChecker::CheckMultiply(-1, min));
     BOOST_CHECK(OverflowChecker::CheckNegate(max) == OverflowChecker::CheckMultiply(-1, max));
     BOOST_CHECK(OverflowChecker::CheckNegate(0));
 
@@ -27,7 +26,6 @@ void test_overflow_multiply_max(is_signed) {
     BOOST_CHECK(OverflowChecker::CheckPlus(1, 0));
     BOOST_CHECK(OverflowChecker::CheckPlus(1, 1));
     BOOST_CHECK(OverflowChecker::CheckPlus(min, max));
-    BOOST_CHECK(std::is_signed_v<T> || (std::is_unsigned_v<T> && !OverflowChecker::CheckPlus(-1, 1)));
     BOOST_CHECK(!OverflowChecker::CheckPlus(max, max));
 
     BOOST_CHECK(OverflowChecker::CheckMultiply(0, 0));
@@ -41,7 +39,7 @@ template<class T>
 void test_overflow_multiply_max(is_unsigned) {
     using OverflowChecker = fractional::overflow::SignedCheckOverflow<T>;
     auto max = std::numeric_limits<T>::max();
-    auto min = std::numeric_limits<T>::min();
+    auto min = std::numeric_limits<T>::lowest();
     BOOST_CHECK(OverflowChecker::CheckNegate(max) == OverflowChecker::CheckMultiply(-1, max));
     BOOST_CHECK(OverflowChecker::CheckNegate(0));
 
@@ -74,6 +72,8 @@ int test_main(int, char *[])             // note the name!
     using namespace fractional;
     using namespace fractional::overflow;
     BOOST_CHECK(std::is_trivial<fraction>::value);
+    test_overflow_multiply_max<char>();
+    test_overflow_multiply_max<short>();
     test_overflow_multiply_max<int>();
     test_overflow_multiply_max<long>();
     test_overflow_multiply_max<int8_t>();
@@ -86,6 +86,10 @@ int test_main(int, char *[])             // note the name!
     test_overflow_multiply_max<uint16_t>();
     test_overflow_multiply_max<uint32_t>();
     test_overflow_multiply_max<uint64_t>();
+
+    test_overflow_multiply_max<float>();
+    test_overflow_multiply_max<double>();
+    test_overflow_multiply_max<long double>();
 
     return boost::exit_success;
 }

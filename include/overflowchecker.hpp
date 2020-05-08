@@ -64,7 +64,7 @@ namespace fractional::overflow {
         using PlusOperator = _PlusOperator;
         using MinusOperator = _MinusOperator;
         using MultiplyOperator = _MultiplyOperator;
-        using DivideOperator = _MultiplyOperator;
+        using DivideOperator = _DivideOperator;
         using NegateOperator = _NegateOperator;
         using ModulusOperator = _ModulusOperator;
 
@@ -126,7 +126,7 @@ namespace fractional::overflow {
         using PlusOperator = _PlusOperator;
         using MinusOperator = _MinusOperator;
         using MultiplyOperator = _MultiplyOperator;
-        using DivideOperator = _MultiplyOperator;
+        using DivideOperator = _DivideOperator;
         using NegateOperator = _NegateOperator;
         using ModulusOperator = _ModulusOperator;
 
@@ -167,7 +167,7 @@ namespace fractional::overflow {
         using PlusOperator = _PlusOperator;
         using MinusOperator = _MinusOperator;
         using MultiplyOperator = _MultiplyOperator;
-        using DivideOperator = _MultiplyOperator;
+        using DivideOperator = _DivideOperator;
         using NegateOperator = _NegateOperator;
         using ModulusOperator = _ModulusOperator;
 
@@ -204,7 +204,7 @@ namespace fractional::overflow {
         using PlusOperator = _PlusOperator;
         using MinusOperator = _MinusOperator;
         using MultiplyOperator = _MultiplyOperator;
-        using DivideOperator = _MultiplyOperator;
+        using DivideOperator = _DivideOperator;
         using NegateOperator = _NegateOperator;
         using ModulusOperator = _ModulusOperator;
 
